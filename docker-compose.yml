@@ -1,0 +1,32 @@
+# Start with:   docker compose up -d
+# Then open:    http://localhost:5100
+#
+# Change the values below, or put them in a .env file next to this one
+# (copy .env.example to .env). See docs/configuration.md.
+
+services:
+  epub2zim:
+    build: .
+    image: epub2zim:latest
+    container_name: epub2zim
+    restart: unless-stopped
+    ports:
+      # "<port on your computer>:<port inside the container>"
+      - "${EPUB2ZIM_PORT:-5100}:${EPUB2ZIM_PORT:-5100}"
+    environment:
+      EPUB2ZIM_PORT: ${EPUB2ZIM_PORT:-5100}
+      # Leave empty to have a key generated (shown on the Settings page,
+      # saved as data/mcp_key.txt). Or set your own long random string.
+      EPUB2ZIM_MCP_KEY: ${EPUB2ZIM_MCP_KEY:-}
+      EPUB2ZIM_MCP_AUTH: ${EPUB2ZIM_MCP_AUTH:-on}
+      EPUB2ZIM_MAX_UPLOAD_MB: ${EPUB2ZIM_MAX_UPLOAD_MB:-300}
+      # Owner of the files in the data folder (run `id` on Linux/macOS to see yours).
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
+    volumes:
+      # Your books, settings and finished .zim files live here.
+      - ${EPUB2ZIM_DATA:-./data}:/data
+    # Lets this container reach programs on your computer (and the other way round
+    # via host.docker.internal) on Linux too.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

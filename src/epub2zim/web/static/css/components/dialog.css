@@ -1,0 +1,26 @@
+/* dialog.css: <dialog> boxes with a ✿ title, pop-in animation and blurred backdrop. */
+
+.modal {
+  width: min(680px, calc(100vw - 24px)); max-height: calc(100vh - 32px); padding: 0;
+  border: 1px solid var(--border); border-radius: 24px; background: var(--surface); color: var(--text);
+  box-shadow: 0 30px 80px -30px rgba(74, 59, 74, .55);
+}
+.modal.small { width: min(440px, calc(100vw - 24px)); }
+.modal::backdrop { background: var(--overlay); backdrop-filter: blur(3px); }
+.modal[open] { animation: pop .18s ease-out; }
+@keyframes pop { from { transform: translateY(8px) scale(.98); opacity: 0; } }
+.modal form { display: flex; flex-direction: column; max-height: calc(100vh - 34px); }
+.modal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px 0; }
+.modal-head h2::before { content: "✿ "; color: var(--pink); }
+.modal-body { padding: 16px 24px 4px; overflow-y: auto; }
+.modal-foot { display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 14px 24px 20px; flex-wrap: wrap; }
+.modal-foot .left { margin-right: auto; }
+.modal .close-x { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--surface-soft); color: var(--text-soft); font-size: 1.1rem; cursor: pointer; }
+.modal .close-x:hover { background: var(--accent-soft); color: var(--accent); }
+.confirm-text { color: var(--text-soft); margin-top: 6px; overflow-wrap: anywhere; }
+.log-view { white-space: pre-wrap; word-break: break-word; font-family: var(--font-mono); font-size: .8rem; background: var(--surface-sunken); border-radius: 14px; padding: 14px; max-height: 65vh; overflow: auto; margin: 0; }
+
+@media (max-width: 640px) {
+  .modal { border-radius: 20px; }
+  .modal-head, .modal-body, .modal-foot { padding-left: 16px; padding-right: 16px; }
+}

@@ -1,0 +1,24 @@
+/* decor.css: blurred colour blobs and slowly floating sparkles behind the page.
+   Pure decoration: fixed, behind content, ignored by screen readers and the mouse,
+   switched off for reduced motion, fewer on phones. */
+
+.bg-blobs { position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
+.blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .45; }
+.blob-pink  { width: 440px; height: 440px; background: var(--pink-soft);  top: -150px; right: -120px; }
+.blob-blue  { width: 380px; height: 380px; background: var(--blue-soft);  bottom: -160px; left: -120px; }
+.blob-lilac { width: 320px; height: 320px; background: var(--lilac-soft); top: 42%; left: 52%; opacity: .35; }
+
+.sparkles { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.sparkle { position: absolute; color: var(--pink); opacity: .45; animation: float 10s ease-in-out infinite; }
+.sparkle:nth-child(1) { top: 13%; left: 3.5%; font-size: 18px; animation-delay: -1s; }
+.sparkle:nth-child(2) { top: 24%; right: 5%; font-size: 24px; animation-delay: -3.5s; color: var(--lilac); }
+.sparkle:nth-child(3) { top: 55%; left: 2%;  font-size: 15px; animation-delay: -2s; color: var(--pink-deep); }
+.sparkle:nth-child(4) { bottom: 16%; right: 3.5%; font-size: 17px; animation-delay: -5s; color: var(--blue); }
+.sparkle:nth-child(5) { top: 76%; left: 7%;  font-size: 12px; animation-delay: -6.5s; color: var(--lilac); }
+.sparkle:nth-child(6) { top: 7%;  left: 47%; font-size: 13px; animation-delay: -4s; }
+.sparkle:nth-child(7) { bottom: 5%; left: 55%; font-size: 16px; animation-delay: -7.5s; color: var(--blue); }
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-8deg); opacity: .3; }
+  50%      { transform: translateY(-16px) rotate(10deg); opacity: .65; }
+}
+@media (max-width: 640px) { .sparkle:nth-child(n+5) { display: none; } }

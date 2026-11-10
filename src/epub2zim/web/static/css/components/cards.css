@@ -1,0 +1,34 @@
+/* cards.css: clickable book cards (with a turning ✦), the warm empty state,
+   and the upload drop zone. */
+
+.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.book-card {
+  display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-card);
+  padding: 18px 20px; box-shadow: var(--shadow); transition: transform .18s ease, box-shadow .18s ease, border-color .18s;
+  position: relative; overflow: hidden;
+}
+.book-card::after { content: "✦"; position: absolute; right: 16px; top: 12px; color: var(--pink); opacity: .35; font-size: 18px; transition: transform .3s, opacity .3s; }
+.book-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); border-color: var(--border-strong); }
+.book-card:hover::after { transform: rotate(45deg) scale(1.2); opacity: .7; }
+.book-card h3 { padding-right: 26px; overflow-wrap: anywhere; }
+.book-card .desc { color: var(--text-soft); font-size: .86rem; overflow-wrap: anywhere; }
+.book-card .foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: auto; padding-top: 10px; border-top: 1px dashed var(--border); }
+
+.empty {
+  text-align: center; padding: 40px 24px; border: 2px dashed var(--border-strong); border-radius: 26px;
+  background: var(--surface-glass); display: grid; gap: 10px; justify-items: center;
+}
+.empty .flower { font-size: 38px; color: var(--pink); animation: float 5s ease-in-out infinite; }
+.empty p { color: var(--text-soft); max-width: 520px; }
+.empty .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+
+.dropzone {
+  display: grid; gap: 8px; justify-items: center; text-align: center; padding: 30px 20px; cursor: pointer;
+  border: 2px dashed var(--border-strong); border-radius: 22px; background: var(--surface-glass);
+  transition: border-color .15s, background .15s, transform .15s;
+}
+.dropzone:hover, .dropzone.over { border-color: var(--accent); background: var(--accent-soft); }
+.dropzone.over { transform: scale(1.01); }
+.dropzone .flower { font-size: 34px; color: var(--pink); }
+.dropzone b { font-family: var(--font-head); font-size: 1.05rem; }

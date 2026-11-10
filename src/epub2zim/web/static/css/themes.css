@@ -1,0 +1,36 @@
+/* themes.css: the dark "Midnight" theme. Same personality as Blush:
+   plum, deep blue and neon-pink accents. Chosen per browser (Settings page). */
+
+:root[data-theme="midnight"] {
+  --white: #2b2235;
+  --blush: #1b1622;
+  --pink-soft: #4a2740;
+  --pink: #f0a3c4;
+  --pink-deep: #ff8ab6;
+  --blue-soft: #222c45;
+  --blue: #93b6ff;
+  --blue-deep: #7ea6f5;
+  --lilac-soft: #2d2440;
+  --lilac: #b896ef;
+  --lilac-deep: #c4a3f7;
+  --mint-soft: #1d3a31;
+  --mint: #6fd3ae;
+  --rose-soft: #47202d;
+  --rose: #ff7a9c;
+  --peach-soft: #3f2c1b;
+  --peach: #f2ad66;
+  --ink: #f5e9f2;
+  --ink-light: #b7a6c3;
+  --line: #3a2e46;
+
+  --bg: #17121d;
+  --surface: #231b2c;
+  --surface-soft: #2b2236;
+  --surface-sunken: #1c1624;
+  --surface-glass: rgba(23, 18, 29, 0.86);
+  --border-strong: #54436a;
+  --overlay: rgba(8, 5, 12, 0.7);
+  --shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.8);
+  --shadow-hover: 0 22px 46px -18px rgba(255, 138, 182, 0.25);
+  color-scheme: dark;
+}

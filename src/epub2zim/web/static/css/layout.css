@@ -1,0 +1,61 @@
+/* layout.css: glass top bar, page frame, cards and sections. */
+
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--surface-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-inner {
+  max-width: 1180px; margin: 0 auto; padding: 12px 22px;
+  display: flex; align-items: center; gap: 18px;
+}
+.brand {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--text);
+  font-family: var(--font-head); font-weight: 700; font-size: 1.2rem; letter-spacing: -.01em;
+}
+.brand-mark {
+  width: 32px; height: 32px; border-radius: 11px; display: grid; place-items: center;
+  background: var(--gradient); color: #fff; font-size: 17px; box-shadow: var(--shadow);
+}
+.brand em { font-style: normal; background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.nav { display: flex; gap: 4px; margin-left: auto; }
+.nav a {
+  text-decoration: none; color: var(--text-soft); font-weight: 700; font-size: .92rem;
+  padding: 7px 14px; border-radius: 999px; transition: background .15s, color .15s;
+}
+.nav a:hover { color: var(--accent); background: var(--accent-soft); }
+.nav a[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
+
+#view:focus { outline: none; }
+.page { max-width: 1180px; margin: 0 auto; padding: 26px 22px 70px; }
+.page.narrow { max-width: 920px; }
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 22px; }
+.page-head .title { display: grid; gap: 4px; min-width: 0; }
+.page-head .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text-soft); text-decoration: none; font-weight: 700; font-size: .86rem; margin-bottom: 10px; }
+.back-link:hover { color: var(--accent); }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-card);
+  box-shadow: var(--shadow); padding: 20px 22px;
+}
+.section { margin-top: 30px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.section-head h2 { display: flex; align-items: center; gap: 8px; }
+.count-bubble { font-family: var(--font-body); font-size: .78rem; font-weight: 800; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 1px 9px; }
+
+.danger-zone { margin-top: 44px; padding-top: 16px; border-top: 1px dashed var(--border-strong); display: flex; justify-content: flex-end; }
+
+.loading { padding: 60px 0; text-align: center; color: var(--text-soft); }
+.loading::before { content: "✦"; display: block; font-size: 26px; color: var(--pink); animation: float 2.4s ease-in-out infinite; }
+
+.footer { text-align: center; color: var(--text-soft); font-size: .8rem; padding: 0 16px 30px; }
+
+@media (max-width: 640px) {
+  .topbar-inner { padding: 10px 14px; gap: 10px; }
+  .brand span.word { display: none; }
+  .nav a { padding: 7px 10px; }
+  .page { padding: 18px 14px 60px; }
+  h1 { font-size: 1.35rem; }
+  .card { padding: 16px; border-radius: 16px; }
+}

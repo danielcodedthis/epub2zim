@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+build/
+dist/
+
+# Your data: books, settings, keys and results never belong in git
+data/
+.env
+*.zim
+*.zim.part
+*.epub
+!tests/**/*.epub

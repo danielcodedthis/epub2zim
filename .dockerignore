@@ -1,0 +1,14 @@
+.git
+.github
+data
+tests
+docs
+skills
+**/__pycache__
+**/*.pyc
+*.egg-info
+.env
+.venv
+venv
+*.zim
+*.epub

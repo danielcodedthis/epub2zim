@@ -1,0 +1,52 @@
+/* buttons.css: one gradient .primary-btn per view; everything else is a quiet
+   .pill-btn, .icon-btn or .link-btn. Destructive actions: .danger-link far away,
+   .danger-btn only inside the confirm dialog. */
+
+.primary-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: none; border-radius: 999px; background: var(--gradient); color: #fff;
+  font-family: var(--font-head); font-weight: 700; font-size: .95rem; text-decoration: none;
+  padding: 10px 20px; cursor: pointer; white-space: nowrap; box-shadow: var(--shadow);
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+}
+.primary-btn:not(:disabled):hover { transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+.primary-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+.primary-btn.big { padding: 13px 26px; font-size: 1rem; }
+
+.pill-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface-soft); color: var(--text-soft); border: 1px solid var(--border);
+  border-radius: 999px; padding: 7px 14px; text-decoration: none;
+  font-family: var(--font-body); font-weight: 700; font-size: .85rem; white-space: nowrap; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.pill-btn:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.pill-btn:disabled { opacity: .5; cursor: not-allowed; }
+.pill-btn.active { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+.pill-btn svg { width: 15px; height: 15px; }
+
+.icon-btn {
+  width: 32px; height: 32px; flex: none; display: inline-grid; place-items: center;
+  border-radius: 50%; border: none; background: transparent; color: var(--text-soft); cursor: pointer;
+  transition: background .15s, color .15s, transform .15s;
+}
+.icon-btn:hover:not(:disabled) { background: var(--accent-soft); color: var(--accent); }
+.icon-btn:disabled { opacity: .3; cursor: default; }
+
+.danger-btn {
+  border: none; border-radius: 999px; padding: 9px 18px; cursor: pointer; background: var(--bad); color: #fff;
+  font-family: var(--font-body); font-weight: 800; font-size: .88rem;
+}
+.danger-btn:hover { filter: brightness(1.06); }
+
+.danger-link {
+  background: none; border: none; padding: 4px 0; cursor: pointer; color: var(--text-soft);
+  font-family: var(--font-body); font-size: .84rem; text-decoration: underline; text-underline-offset: 3px;
+}
+.danger-link:hover { color: var(--bad); }
+
+.link-btn {
+  background: none; border: none; padding: 2px 4px; cursor: pointer; color: var(--accent);
+  font-family: var(--font-body); font-weight: 700; font-size: .85rem;
+}
+.link-btn:hover { text-decoration: underline; }

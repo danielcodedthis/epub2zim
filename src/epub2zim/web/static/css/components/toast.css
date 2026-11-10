@@ -1,0 +1,13 @@
+/* toast.css: short messages floating at the bottom of the screen. */
+
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 50;
+  max-width: min(520px, calc(100vw - 32px)); padding: 11px 20px; border-radius: 999px;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border);
+  box-shadow: var(--shadow-hover); font-weight: 700; font-size: .9rem; text-align: center;
+  animation: pop .18s ease-out;
+}
+.toast::before { content: "✦ "; color: var(--accent); }
+.toast.ok::before { content: "✓ "; color: var(--ok); }
+.toast.err { color: var(--bad); }
+.toast.err::before { content: "! "; color: var(--bad); }

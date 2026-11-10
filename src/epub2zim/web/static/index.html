@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>epub2zim</title>
+  <meta name="theme-color" content="#fff6fa">
+  <!-- Apply the saved theme before the first paint, so there is no flash. -->
+  <script>
+    try { var t = localStorage.getItem("epub2zim.theme"); if (t && t !== "blush") document.documentElement.dataset.theme = t; } catch (e) {}
+  </script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✿</text></svg>">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/decor.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components/buttons.css">
+  <link rel="stylesheet" href="css/components/forms.css">
+  <link rel="stylesheet" href="css/components/chips.css">
+  <link rel="stylesheet" href="css/components/dialog.css">
+  <link rel="stylesheet" href="css/components/toast.css">
+  <link rel="stylesheet" href="css/components/cards.css">
+  <link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <!-- Decoration only (see css/decor.css) -->
+  <div class="bg-blobs" aria-hidden="true"><span class="blob blob-pink"></span><span class="blob blob-blue"></span><span class="blob blob-lilac"></span></div>
+  <div class="sparkles" aria-hidden="true">
+    <span class="sparkle">✦</span><span class="sparkle">✧</span><span class="sparkle">♡</span><span class="sparkle">✦</span>
+    <span class="sparkle">✧</span><span class="sparkle">✦</span><span class="sparkle">✧</span>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#/"><span class="brand-mark" aria-hidden="true">✿</span><span>epub<em>·</em>2<em>·</em>zim</span></a>
+      <nav class="nav" aria-label="Main">
+        <a href="#/" data-nav="home">Books</a>
+        <a href="#/help" data-nav="help">Help</a>
+        <a href="#/settings" data-nav="settings">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Pages are drawn here by js/app.js -->
+  <main id="view" tabindex="-1"><div class="loading">Loading…</div></main>
+
+  <footer class="footer">epub2zim · turns EPUB books into searchable ZIM files · runs on your own computer</footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

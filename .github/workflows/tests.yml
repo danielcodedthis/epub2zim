@@ -1,0 +1,32 @@
+# Runs the tests on every push and pull request, and checks the Docker image builds.
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install -e ".[dev]"
+      - run: pytest
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t epub2zim .
+      - name: Start the container and check it answers
+        run: |
+          docker run -d --name e2z -p 5100:5100 -e EPUB2ZIM_MCP_KEY=ci-key epub2zim
+          for i in $(seq 1 30); do curl -sf localhost:5100/api/health && break; sleep 1; done
+          curl -sf localhost:5100/api/health
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST localhost:5100/mcp)" = "401"

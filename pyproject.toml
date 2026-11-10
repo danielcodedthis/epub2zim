@@ -1,0 +1,53 @@
+# Packaging for epub2zim.
+# Install for development with:   pip install -e ".[dev]"
+# Run the app with:               epub2zim serve
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "epub2zim"
+version = "0.1.0"
+description = "Turn EPUB books into searchable, wiki-style ZIM files for Kiwix, Zimi and other ZIM readers."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "epub2zim contributors" }]
+keywords = ["epub", "zim", "kiwix", "zimi", "offline", "ebook", "mcp"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: Text Processing :: Markup :: HTML",
+  "Environment :: Web Environment",
+]
+dependencies = [
+  "libzim>=4.0",            # writes .zim files (with the full-text search index)
+  "beautifulsoup4>=4.12",   # reads and cleans the book's HTML
+  "lxml>=5.0",              # fast HTML/XML parser used by BeautifulSoup
+  "Pillow>=10.0",           # makes the 48x48 ZIM icon
+  "fastapi>=0.110",         # web API
+  "uvicorn>=0.29",          # web server
+  "python-multipart>=0.0.9",# file uploads
+  "mcp>=2.0,<3",            # Model Context Protocol server for AI assistants
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "httpx>=0.27"]
+
+[project.scripts]
+epub2zim = "epub2zim.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/danielcodedthis/epub2zim"
+Documentation = "https://github.com/danielcodedthis/epub2zim/tree/main/docs"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+epub2zim = ["web/static/**/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::bs4.XMLParsedAsHTMLWarning"]
