@@ -1,5 +1,8 @@
 """epub2zim: turn EPUB books into searchable, wiki-style ZIM files.
 
+Copyright (C) 2026 epub2zim contributors. Licensed under the GNU General Public
+License v3.0 or later (see LICENSE).
+
 The package is split into small modules, each doing one job:
 
     config.py        settings from environment variables / command line

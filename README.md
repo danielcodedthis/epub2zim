@@ -165,5 +165,9 @@ are a great place to start.
 
 ## License
 
-MIT (see [LICENSE](LICENSE)). Bundled fonts Nunito and Quicksand: SIL Open Font License.
-Built on [libzim](https://github.com/openzim/python-libzim) by openZIM.
+**GPL-3.0-or-later** (see [LICENSE](LICENSE)). In short: everyone may use, study, change and
+share epub2zim for free, and anyone who shares a changed version must share it under the
+same license, with its source code. That keeps every improvement free for everyone.
+
+Bundled fonts Nunito and Quicksand: SIL Open Font License. Built on
+[libzim](https://github.com/openzim/python-libzim) by openZIM (also GPL-3.0).
