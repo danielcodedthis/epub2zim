@@ -28,7 +28,8 @@ __all__ = ["Article", "SplitResult", "split"]
 def split(book: Book, settings: Settings, entries: list[Entry] | None = None) -> SplitResult:
     if settings.strategy == "titles":
         offset = settings.page_offset.strip() if isinstance(settings.page_offset, str) else settings.page_offset
-        return split_by_titles(book, entries or [], clean=settings.clean_text, page_offset=offset or None)
+        return split_by_titles(book, entries or [], clean=settings.clean_text, page_offset=offset or None,
+                               drop_heading=settings.drop_heading_text)
     blocks = book_blocks(book)
     if settings.strategy == "headings":
         return split_by_headings(blocks, settings.heading_level)

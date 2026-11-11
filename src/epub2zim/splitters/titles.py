@@ -11,7 +11,9 @@ How it works:
      Without a page we search from the previous match onwards.
   3. When the text appears more than once, we prefer the place that looks most
      like a heading (see _score).
-  4. Each article runs from its match to the next one.
+  4. Each article runs from its match to the next one. The heading words are
+     removed from the start of the article (the page shows the title already),
+     but only when they look like a heading; a sentence is always kept.
 
 Titles that are never found are reported as "misses"; their text simply stays
 in the article before them.
@@ -49,8 +51,29 @@ def _score(stream: str, pos: int, page_start: bool) -> float:
     return 5
 
 
+def looks_like_heading(text: str) -> bool:
+    """Short and not a finished sentence: "Chapter 1", "Soil Care", "Prevalence".
+
+    A whole sentence used as "text to look for" (because the book has no real
+    headings) is NOT a heading, so it is kept in the article.
+    """
+    t = text.strip()
+    return 0 < len(t.split()) <= 12 and not t.endswith((".", "!", "?", "…", ",", ";", ":", "»", "”", '"'))
+
+
+def _drop_heading(text: str, e: Entry) -> str:
+    """Remove the heading words at the start of an article (the page shows the title already).
+
+    Only words that look like a heading are removed; sentences are always kept.
+    """
+    for heading in dict.fromkeys([e.search_text, e.title]):     # search text first, then title
+        if text.startswith(heading) and looks_like_heading(heading):
+            text = text[len(heading):].lstrip(" :.")
+    return text
+
+
 def split_by_titles(book: Book, entries: list[Entry], *, clean: bool = True,
-                    page_offset: int | str | None = "auto") -> SplitResult:
+                    page_offset: int | str | None = "auto", drop_heading: bool = True) -> SplitResult:
     result = SplitResult(articles=[])
     articles_entries = [e for e in entries if not e.is_group]
     if not articles_entries:
@@ -113,11 +136,8 @@ def split_by_titles(book: Book, entries: list[Entry], *, clean: bool = True,
     for n, (p, e, grp) in enumerate(found):
         end = found[n + 1][0] if n + 1 < len(found) else len(stream)
         text = stream[p:end].strip()
-        # Drop the heading words themselves; the page shows the title already.
-        if text.startswith(e.search_text):
-            text = text[len(e.search_text):].lstrip(" :.")
-        if e.find and text.startswith(e.title):
-            text = text[len(e.title):].lstrip(" :.")
+        if drop_heading:
+            text = _drop_heading(text, e)
         page_no = next(i for i in range(len(pages), 0, -1) if starts[i - 1] <= p)
         result.articles.append(Article(e.title, e.level, "text", text, page=page_no, group=grp))
     return result

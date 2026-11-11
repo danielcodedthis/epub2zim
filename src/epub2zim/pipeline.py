@@ -19,6 +19,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from .article_edits import EditReport, edit_articles
 from .autolink import AutoLinker
 from .blocks import book_blocks
 from .cleaning import detect_page_offset, raw_pages
@@ -140,12 +141,25 @@ def suggest_titles(path: str | Path, method: str, level: int = 2, pattern: str =
 class Prepared:
     book: Book
     result: SplitResult
+    edits: EditReport
 
 
 def _prepare(path: str | Path, settings: Settings, titles_text: str) -> Prepared:
+    """Split the book, then rename / prefix / leave out articles (article_edits.py)."""
     book = load_book(path)
     entries = parse(titles_text) if settings.strategy == "titles" else None
-    return Prepared(book, split(book, settings, entries))
+    result = split(book, settings, entries)
+    result.articles, edits = edit_articles(result.articles, settings)
+    if not settings.description.strip():
+        result.warnings.append(f"No description yet. The ZIM will say: “{_description(settings, book)}”. "
+                               "Add your own in step 3 (max 80 characters).")
+    return Prepared(book, result, edits)
+
+
+def _description(settings: Settings, book: Book) -> str:
+    """The description that goes into the ZIM (yours, else the book's, else a default)."""
+    text = settings.description or (book.description and book.description[:80]) or "Converted from EPUB with epub2zim"
+    return " ".join(text.split())[:80]
 
 
 def _assign_paths(articles: list[Article]) -> None:
@@ -171,9 +185,11 @@ def preview(path: str | Path, settings: Settings, titles_text: str = "") -> dict
         "page_offset": prep.result.page_offset,
         "misses": prep.result.misses,
         "warnings": prep.result.warnings,
+        "excluded": prep.edits.excluded,
         "articles": [
             {"n": i + 1, "title": a.title, "level": a.level, "group": a.group, "page": a.page,
-             "chars": a.size, "start": re.sub(r"<[^>]+>", " ", a.content)[:90].split("\n")[0].strip()}
+             "chars": a.size, "renamed_from": prep.edits.renamed.get(a.title),
+             "start": " ".join(re.sub(r"<[^>]+>", " ", a.content[:400]).split())[:90]}
             for i, a in enumerate(arts)
         ],
     }
@@ -202,8 +218,11 @@ def _children(arts: list[Article], i: int) -> list[Article]:
 
 
 def build(path: str | Path, settings: Settings, out_path: str | Path, titles_text: str = "",
-          aliases_text: str = "") -> dict:
-    """Make the .zim file. Returns a short report."""
+          aliases_text: str = "", cover_png: bytes | None = None) -> dict:
+    """Make the .zim file. Returns a short report.
+
+    cover_png: a cover you uploaded (PNG). Without it the book's own cover is used, if any.
+    """
     started = time.time()
     prep = _prepare(path, settings, titles_text)
     book, arts = prep.book, prep.result.articles
@@ -258,10 +277,18 @@ def build(path: str | Path, settings: Settings, out_path: str | Path, titles_tex
             page=a.page, from_scan=a.kind == "text", lang=lang2)
         plan.entries.append(ZimEntry(a.path, a.title, "text/html", page, front=True))
 
+    # Cover: the one you uploaded, else the book's own. Used for the icon and the home page.
+    cover, cover_mime = (cover_png, "image/png") if cover_png else \
+        (book.images.get(book.cover_href, (None, ""))) if book.cover_href else (None, "")
+    cover_path = None
+    if cover and settings.cover_on_home:
+        cover_path = "images/_epub2zim_cover" + {"image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp"}.get(cover_mime, ".png")
+        plan.entries.append(ZimEntry(cover_path, "Cover", cover_mime or "image/png", cover))
+
     plan.entries.append(ZimEntry("style.css", "style", "text/css", CSS))
     plan.entries.append(ZimEntry("index", book_title, "text/html", home_page(
         book_title=book_title, author=settings.creator or book.author,
-        description=settings.description, lang=lang2,
+        description=settings.description, lang=lang2, cover_path=cover_path,
         items=[(a.group, a.level, a.path, a.title) for a in arts]), front=True))
     for href, zpath in used_images.items():
         data, mime = book.images[href]
@@ -280,13 +307,12 @@ def build(path: str | Path, settings: Settings, out_path: str | Path, titles_tex
             paths.add(alias_path.lower())
             plan.redirects.append((alias_path, alias, target_path))
 
-    cover = book.images.get(book.cover_href, (None, ""))[0] if book.cover_href else None
     plan.icon_png = make_icon(cover, book_title)
     name = settings.name or f"{slugify(book_title, 30).replace('-', '_')}_{lang2}"
-    description = settings.description or (book.description and book.description[:80]) or "Converted from EPUB with epub2zim"
+    description = _description(settings, book)
     plan.metadata = {
         "Name": name, "Title": book_title[:30], "Language": lang3,
-        "Description": " ".join(description.split())[:80],
+        "Description": description,
         "LongDescription": f"{book_title}" + (f" by {settings.creator or book.author}" if (settings.creator or book.author) else "")
                            + f". {len(arts)} articles, made with epub2zim.",
         "Creator": settings.creator or book.author or "Unknown",
@@ -299,6 +325,7 @@ def build(path: str | Path, settings: Settings, out_path: str | Path, titles_tex
         "file": str(out), "file_name": out.name, "size_bytes": out.stat().st_size,
         "articles": len(arts), "aliases": len(plan.redirects), "images": len(used_images),
         "misses": prep.result.misses, "alias_misses": alias_misses, "warnings": prep.result.warnings,
+        "excluded": prep.edits.excluded,
         "seconds": round(time.time() - started, 1),
     }
 
@@ -323,7 +350,8 @@ def build_project(project: Project, output_copy_dir: Path | None = None) -> dict
     s = project.settings()
     book_title = s.title or load_book(project.epub_path).title
     file_name = f"{slugify(s.name or book_title, 50)}_{time.strftime('%Y-%m')}.zim"
-    report = build(project.epub_path, s, project.output_dir / file_name, project.titles(), project.aliases())
+    report = build(project.epub_path, s, project.output_dir / file_name, project.titles(), project.aliases(),
+                   cover_png=project.cover())
     if output_copy_dir:
         output_copy_dir.mkdir(parents=True, exist_ok=True)
         shutil.copy2(report["file"], output_copy_dir / file_name)

@@ -5,6 +5,7 @@
         project.json     settings (see settings.py) + name and dates
         titles.txt       the title list (see titlelist.py)
         aliases.txt      extra search names ("PTSD = Posttraumatic Stress Disorder")
+        cover.png        optional cover you uploaded (replaces the book's own cover)
         output/          finished .zim files
 
 Every finished .zim is also copied to <data>/output/ so a ZIM reader such as
@@ -13,11 +14,13 @@ Zimi or kiwix-serve can watch a single folder.
 
 from __future__ import annotations
 
+import io
 import json
 import re
 import secrets
 import shutil
 import time
+import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -31,9 +34,24 @@ class ProjectError(ValueError):
     """A friendly error about projects (unknown id, bad file name, ...)."""
 
 
+# Cyrillic -> Latin, so "Престъпление и наказание" gives a readable file name
+# ("prestaplenie-i-nakazanie") instead of "book". Bulgarian/Russian/Ukrainian letters.
+_CYRILLIC = dict(zip(
+    "абвгдежзийклмнопрстуфхцчшщъыьэюяёєіїґ",
+    ["a", "b", "v", "g", "d", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u",
+     "f", "h", "ts", "ch", "sh", "sht", "a", "y", "", "e", "yu", "ya", "yo", "ye", "i", "yi", "g"],
+))
+
+
 def slugify(text: str, limit: int = 40) -> str:
-    s = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+    """'Moby-Dick; or, The Whale' -> 'moby-dick-or-the-whale' (used for ids and file names)."""
+    text = "".join(_CYRILLIC.get(ch, ch) for ch in text.lower())
+    text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode()   # é -> e, ü -> u
+    s = re.sub(r"[^a-z0-9]+", "-", text).strip("-")
     return s[:limit].strip("-") or "book"
+
+
+COVER_MAX = 1000   # pixels: uploaded covers are shrunk to fit inside 1000x1000
 
 
 @dataclass
@@ -88,6 +106,31 @@ class Project:
     def set_aliases(self, text: str) -> None:
         self._write("aliases.txt", text)
 
+    # --- cover you uploaded -------------------------------------------
+    @property
+    def cover_path(self) -> Path:
+        return self.dir / "cover.png"
+
+    def cover(self) -> bytes | None:
+        return self.cover_path.read_bytes() if self.cover_path.exists() else None
+
+    def set_cover(self, data: bytes) -> None:
+        """Save an uploaded picture as cover.png (any format Pillow reads; shrunk to fit 1000 px)."""
+        from PIL import Image
+        try:
+            im = Image.open(io.BytesIO(data))
+            im.load()
+        except Exception as exc:
+            raise ProjectError("That file is not a picture (use PNG, JPG, WebP or GIF).") from exc
+        im = im.convert("RGBA") if im.mode in ("P", "LA", "RGBA") else im.convert("RGB")
+        im.thumbnail((COVER_MAX, COVER_MAX))
+        buf = io.BytesIO()
+        im.save(buf, "PNG", optimize=True)
+        self.cover_path.write_bytes(buf.getvalue())
+
+    def remove_cover(self) -> None:
+        self.cover_path.unlink(missing_ok=True)
+
     # --- results -------------------------------------------------------
     def zim_files(self) -> list[Path]:
         if not self.output_dir.exists():
@@ -106,6 +149,7 @@ class Project:
             "updated": info.get("updated", ""),
             "strategy": s.strategy,
             "zim": zims[0].name if zims else None,
+            "has_cover_upload": self.cover_path.exists(),
             "zim_size": zims[0].stat().st_size if zims else None,
         }
 
@@ -141,18 +185,21 @@ class ProjectStore:
                      created=time.strftime("%Y-%m-%d %H:%M:%S"))
         return project
 
-    def import_from_inbox(self, file_name: str) -> Project:
-        """New project from a file already in <data>/inbox (used by MCP and CLI).
-
-        Only plain file names are accepted, so nothing outside the inbox can be read.
-        """
+    def inbox_file(self, file_name: str, suffixes: tuple[str, ...] = (".epub",)) -> Path:
+        """A file inside <data>/inbox. Only plain file names are accepted, so nothing
+        outside the inbox can be read."""
         if not file_name or Path(file_name).name != file_name:
-            raise ProjectError("Give just the file name of an EPUB inside the inbox folder, e.g. 'mybook.epub'.")
+            raise ProjectError("Give just the file name of a file inside the inbox folder, e.g. 'mybook.epub'.")
         path = self.config.inbox_dir / file_name
         if not path.is_file():
-            available = ", ".join(sorted(p.name for p in self.config.inbox_dir.glob("*.epub"))) or "none"
-            raise ProjectError(f"'{file_name}' is not in the inbox. EPUB files there: {available}.")
-        return self.create(path.read_bytes(), file_name)
+            available = ", ".join(sorted(p.name for p in self.config.inbox_dir.iterdir()
+                                         if p.suffix.lower() in suffixes)) or "none"
+            raise ProjectError(f"'{file_name}' is not in the inbox. Matching files there: {available}.")
+        return path
+
+    def import_from_inbox(self, file_name: str) -> Project:
+        """New project from an EPUB already in <data>/inbox (used by MCP and CLI)."""
+        return self.create(self.inbox_file(file_name).read_bytes(), file_name)
 
     def delete(self, project_id: str) -> None:
         project = self.get(project_id)

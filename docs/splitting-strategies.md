@@ -19,8 +19,9 @@ and the chapter page lists them under *In this section*.
 
 - An entry pointing to `file.xhtml#id` starts at the block holding that id; an entry
   without `#id` starts at the top of the file.
-- Two entries at the same spot (e.g. “Part I” and “Chapter 1”) are merged and a warning is
-  shown.
+- A part and its first chapter at the same spot (“Part I” and “Chapter 1”) are both kept:
+  the part becomes a short page listing its chapters. Two entries of the *same* level at the
+  same spot are merged, with a warning.
 - Text before the first entry (cover, copyright…) becomes **Front matter** if it is longer
   than 200 characters.
 
@@ -54,7 +55,11 @@ You give a [title list](title-list-format.md). For each title, in order, epub2zi
 3. if it appears several times, prefers the place that looks like a heading: start of a
    page or right after a sentence end, then after a capitalised word; mentions inside a
    sentence are a last resort, and text in quotation marks is never used;
-4. starts the article there; it runs to the next title.
+4. starts the article there; it runs to the next title. The heading words are removed from
+   the start of the article (the page shows the title already), but **only if they look like
+   a heading**: at most 12 words, not ending like a sentence. A full sentence used as *text to
+   look for* is always kept. Switch removal off with *Remove the matched heading words*
+   (`drop_heading_text`).
 
 Titles that are never found are listed as **misses**; their text stays in the previous
 article. Without a page number the search runs from the previous title to the end of the

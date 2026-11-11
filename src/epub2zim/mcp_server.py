@@ -37,11 +37,14 @@ Steps:
 3. For 'titles': suggest_titles(method='running_headers' or 'pattern'), check with read_pages/find_text,
    fix the list with set_title_list or replace_in_title_list. Format: 'Title | page | text to look for',
    '-' prefix per nesting level, '= Group' for headings on the home page.
-4. update_settings: title, description (<=80 chars), language (3 letters, e.g. eng), creator.
+4. update_settings: title, description (<=80 chars; always set one), language (3 letters, e.g. eng), creator.
 5. preview_split: look at article count, 'misses' (titles not found) and tiny/huge articles. Fix and repeat.
-6. Optional: set_aliases ('Short name = Article title' per line) for abbreviations.
+   - Junk articles (title page, credits, contents): update_settings {"exclude": ["Title page", "Credits*"]}.
+   - Chapters only called I, II, 3...: parent_prefix "short" (default) makes them "Part One · I".
+   - Other bad titles: update_settings {"renames": ["Old title = New title"]}.
+6. Optional: set_aliases ('Short name = Article title' per line), set_cover(file_name from the inbox).
 7. build_zim -> file name and download link. Tell the user where the file is.
-Ask the user before overwriting a title list they wrote themselves."""
+Ask the user before overwriting a title list they wrote themselves, and before delete_project."""
 
 
 def friendly(fn):
@@ -179,8 +182,10 @@ def create_mcp(config: Config, store: ProjectStore) -> MCPServer:
     @mcp.tool()
     @friendly
     def update_settings(project_id: str, changes: dict) -> str:
-        """Changes settings, e.g. {"strategy": "headings", "heading_level": 2, "title": "My Book"}.
-        strategy: toc | headings | files | titles."""
+        """Changes settings, e.g. {"strategy": "headings", "heading_level": 2, "title": "My Book",
+        "description": "...", "exclude": ["Title page", "Credits"], "renames": ["Old = New"],
+        "parent_prefix": "short"}. strategy: toc | headings | files | titles.
+        exclude: titles to leave out (* = wildcard). parent_prefix: never | short | always."""
         p = project(project_id)
         merged = {**p.settings().to_dict(), **(changes or {})}
         try:
@@ -218,11 +223,37 @@ def create_mcp(config: Config, store: ProjectStore) -> MCPServer:
         if pv["misses"]:
             lines.append(f"MISSES ({len(pv['misses'])}): " + "; ".join(pv["misses"][:30]))
         lines += [f"WARNING: {w}" for w in pv["warnings"][:10]]
+        if pv["excluded"]:
+            lines.append(f"LEFT OUT ({len(pv['excluded'])}): " + "; ".join(pv["excluded"][:30]))
         arts = pv["articles"][max(0, first - 1):max(0, first - 1) + min(show, 200)]
         lines += [f"{a['n']} | L{a['level']} | {a['title']} | p{a['page']} | {a['chars']} | {a['start'][:60]}" for a in arts]
         if pv["article_count"] > first - 1 + len(arts):
             lines.append(f"... use first={first + len(arts)} to see more")
         return "\n".join(lines)
+
+    @mcp.tool()
+    @friendly
+    def set_cover(project_id: str, file_name: str = "") -> str:
+        """Uses a picture from the inbox (PNG/JPG/WebP, e.g. 500x500) as the ZIM's cover and icon.
+        Give just the file name. Empty file_name removes your cover (the book's own cover is used again)."""
+        p = project(project_id)
+        if not file_name:
+            p.remove_cover()
+            return "Cover removed. The book's own cover (if any) will be used."
+        p.set_cover(store.inbox_file(file_name, (".png", ".jpg", ".jpeg", ".webp", ".gif")).read_bytes())
+        return "Cover saved. It will be the library icon and appear on the home page."
+
+    @mcp.tool()
+    @friendly
+    def delete_project(project_id: str, confirm: bool = False) -> str:
+        """Deletes a project: its EPUB copy, settings, title list and built ZIM files (copies in the
+        output folder stay). Ask the user first, then call with confirm=true."""
+        p = project(project_id)
+        if not confirm:
+            return (f"This will delete '{p.summary()['name']}' ({project_id}) and its ZIM files. "
+                    "Ask the user, then call delete_project again with confirm=true.")
+        store.delete(project_id)
+        return f"Deleted {project_id}."
 
     @mcp.tool()
     @friendly
@@ -233,7 +264,7 @@ def create_mcp(config: Config, store: ProjectStore) -> MCPServer:
         url = f"http://{'localhost' if config.host in ('0.0.0.0', '127.0.0.1') else config.host}:{config.port}" \
               f"/api/projects/{p.id}/download/{report['file_name']}"
         return _fmt({**{k: report[k] for k in ("file_name", "size_bytes", "articles", "aliases", "images",
-                                                "misses", "alias_misses", "seconds")},
+                                                "misses", "alias_misses", "excluded", "warnings", "seconds")},
                      "download": url, "library_copy": report.get("library_copy")})
 
     return mcp

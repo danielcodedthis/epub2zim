@@ -45,6 +45,14 @@ def _settings(args):
     }.items() if v is not None}
     if args.subheading:
         data["subheadings"] = args.subheading
+    if args.exclude:
+        data["exclude"] = args.exclude
+    if args.rename:
+        data["renames"] = args.rename
+    if args.parent_prefix:
+        data["parent_prefix"] = args.parent_prefix
+    if args.keep_heading_text:
+        data["drop_heading_text"] = False
     if args.lists:
         data["detect_lists"] = True
     if args.no_links:
@@ -101,7 +109,14 @@ def cmd_preview(args) -> None:
 def cmd_convert(args) -> None:
     from .pipeline import build
     out = args.output or Path(args.epub).with_suffix(".zim")
-    report = build(args.epub, _settings(args), out, _read(args.titles), _read(args.aliases))
+    cover = None
+    if args.cover:
+        from PIL import Image
+        import io
+        buf = io.BytesIO()
+        Image.open(args.cover).convert("RGBA").save(buf, "PNG")
+        cover = buf.getvalue()
+    report = build(args.epub, _settings(args), out, _read(args.titles), _read(args.aliases), cover_png=cover)
     report.pop("file", None)
     print(json.dumps(report, indent=2, ensure_ascii=False))
     print(f"✿ Wrote {out}")
@@ -116,6 +131,12 @@ def _split_options(p) -> None:
     p.add_argument("--subheading", action="append", help="phrase to turn into a section heading (repeatable)")
     p.add_argument("--lists", action="store_true", help="put 'A. ...' / '1. ...' items on separate lines")
     p.add_argument("--no-links", action="store_true", help="don't link mentions of other article titles")
+    p.add_argument("--exclude", action="append", help="leave out articles with this title; * = wildcard (repeatable)")
+    p.add_argument("--rename", action="append", help="'Old title = New title' (repeatable)")
+    p.add_argument("--parent-prefix", choices=["never", "short", "always"],
+                   help="put the parent's title in front: 'Part One · I' (default: short titles only)")
+    p.add_argument("--keep-heading-text", action="store_true",
+                   help="titles strategy: keep the matched heading words at the start of articles")
     p.add_argument("--title", help="title shown in the ZIM reader")
     p.add_argument("--language", help="3-letter language code, e.g. eng")
     p.add_argument("--description", help="one line, max 80 characters")
@@ -157,6 +178,7 @@ def build_parser() -> argparse.ArgumentParser:
     _split_options(p)
     p.add_argument("-o", "--output", help="output .zim path (default: next to the EPUB)")
     p.add_argument("--aliases", help="aliases file ('Short name = Article title' per line)")
+    p.add_argument("--cover", help="picture to use as cover and icon (PNG/JPG/WebP)")
     p.set_defaults(func=cmd_convert)
     return parser
 

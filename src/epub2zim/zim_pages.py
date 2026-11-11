@@ -32,7 +32,8 @@ pre{background:var(--box);padding:.7rem;overflow-x:auto}
 .items p{margin:.35rem 0}.items .li-1{margin-left:1.6rem}.items .li-i{margin-left:3.2rem}.items .li-x{margin-left:.8rem}
 .nav{display:flex;justify-content:space-between;gap:1rem;border-top:1px solid var(--line);margin-top:2.2rem;padding-top:.6rem;font-size:.88rem}
 .note{font-size:.78rem;color:var(--soft);margin-top:1.2rem}
-.home h1::before{content:"✿ ";color:var(--accent)}
+.home-cover{float:right;max-width:min(200px,38%);height:auto;margin:.4rem 0 1rem 1.2rem;border-radius:6px;box-shadow:0 6px 20px -8px rgba(0,0,0,.35)}
+.home h2{clear:both}
 .home-intro{color:var(--soft);font-size:.95rem}
 .home ul{columns:2;column-gap:2rem;padding-left:1.2rem}.home li{break-inside:avoid;margin:.15rem 0}
 .home li.l2{margin-left:1rem;list-style:circle}.home li.l3{margin-left:2rem;list-style:square}
@@ -75,10 +76,18 @@ def article_page(*, title: str, content_html: str, book_title: str, parents: lis
 
 
 def home_page(*, book_title: str, author: str, description: str,
-              items: list[tuple[str | None, int, str, str]], lang: str = "en") -> str:
-    """The main page: every article, grouped. items = (group, level, path, title)."""
-    body = f'<div class="home"><h1>{html.escape(book_title)}</h1>'
-    intro = " · ".join(x for x in (author, description) if x)
+              items: list[tuple[str | None, int, str, str]], lang: str = "en",
+              cover_path: str | None = None) -> str:
+    """The main page: cover (optional), intro, every article grouped.
+
+    items = (group, level, path, title). cover_path = address of the cover image in the ZIM.
+    No decorative symbols here: ZIM readers may not have the fonts to show them.
+    """
+    body = '<div class="home">'
+    if cover_path:
+        body += f'<img class="home-cover" src="{html.escape(cover_path)}" alt="Cover">'
+    body += f"<h1>{html.escape(book_title)}</h1>"
+    intro =" · ".join(x for x in (author, description) if x)
     body += f'<p class="home-intro">{html.escape(intro)}{" — " if intro else ""}Use the search box to find any word in the book.</p>'
     current_group = object()
     open_list = False

@@ -57,16 +57,23 @@ Both take the same splitting options:
 | `--subheading TEXT` | Phrase that becomes a heading (repeat for more) |
 | `--lists` | Put `A. …` / `1. …` items on their own lines |
 | `--no-links` | No wiki-style links |
+| `--exclude TITLE` | Leave out articles with this title; `*` = wildcard (repeat for more) |
+| `--rename "Old = New"` | Rename an article (repeat for more) |
+| `--parent-prefix never\|short\|always` | Put the parent's title in front (“Part One · I”); default `short` |
+| `--keep-heading-text` | Title list strategy: keep the matched heading words in the article |
 | `--title`, `--language`, `--description`, `--creator` | Metadata |
 
-`convert` also has `-o/--output FILE.zim` (default: next to the EPUB) and
-`--aliases FILE`.
+`convert` also has `-o/--output FILE.zim` (default: next to the EPUB),
+`--aliases FILE` and `--cover PICTURE`.
 
 ## Examples
 
 ```bash
 # A normal book
 epub2zim convert alice.epub --language eng --description "Lewis Carroll's classic"
+
+# Drop the title page and credits, use your own cover
+epub2zim convert novel.epub --exclude "Title page" --exclude "Credits*" --cover cover.jpg
 
 # Smaller articles
 epub2zim preview manual.epub --strategy headings --heading-level 3

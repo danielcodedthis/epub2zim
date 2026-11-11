@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field, fields
 
 STRATEGIES = ("toc", "headings", "files", "titles")
+PARENT_PREFIX = ("never", "short", "always")
 
 
 @dataclass
@@ -25,8 +26,17 @@ class Settings:
     strategy: str = "toc"        # toc | headings | files | titles (see docs/splitting-strategies.md)
     heading_level: int = 2       # "headings" strategy: split at <h1> .. <hN>
 
+    # --- Article titles and leaving articles out (all strategies, see article_edits.py) ---
+    parent_prefix: str = "short"   # never | short | always: put the parent's title in front,
+                                   # e.g. "Part One · I" ("short" = only titles like I, II, 3, Chapter 4)
+    prefix_separator: str = " · "
+    renames: list[str] = field(default_factory=list)   # "Old title = New title" lines
+    exclude: list[str] = field(default_factory=list)   # titles to leave out; * matches anything
+
     # --- Scanned (OCR) books, used by the "titles" strategy ---
     clean_text: bool = True      # remove printed page numbers and running headers
+    drop_heading_text: bool = True  # remove the matched heading words from the article start
+                                    # (only when they look like a heading, never a whole sentence)
     page_offset: str = "auto"    # "auto", a number, or "" for none
     subheadings: list[str] = field(default_factory=list)  # phrases to turn into section headings
     detect_lists: bool = False   # turn "A. ... B. ..." and "1. ... 2. ..." into separate lines
@@ -36,6 +46,7 @@ class Settings:
     autolink: bool = True        # link mentions of other article titles, like a wiki
     autolink_min_length: int = 8 # ignore titles shorter than this (avoids silly links)
     include_images: bool = True  # copy the book's pictures into the ZIM
+    cover_on_home: bool = True   # show the cover at the top of the ZIM's home page
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -73,3 +84,8 @@ class Settings:
             raise ValueError("description must be 80 characters or fewer (a ZIM file rule)")
         if self.paragraph_size < 200:
             raise ValueError("paragraph_size must be at least 200")
+        if self.parent_prefix not in PARENT_PREFIX:
+            raise ValueError(f"parent_prefix must be one of {', '.join(PARENT_PREFIX)}")
+        for line in self.renames:
+            if "=" not in line:
+                raise ValueError(f"Rename '{line}': use the form  Old title = New title")

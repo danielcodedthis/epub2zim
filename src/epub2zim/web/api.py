@@ -7,7 +7,7 @@ in a browser for the interactive version FastAPI generates.
 from __future__ import annotations
 
 from fastapi import APIRouter, File, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 
 from .. import __version__, pipeline
@@ -104,6 +104,33 @@ def create_router(config: Config, store: ProjectStore) -> APIRouter:
         n = len(parse_aliases(body.text))
         store.get(pid).set_aliases(body.text)
         return {"aliases": n}
+
+    # ---------------------------------------------------------------- cover
+    @r.get("/projects/{pid}/cover")
+    def get_cover(pid: str):
+        """The cover that will be used: your upload, else the book's own cover."""
+        p = store.get(pid)
+        data = p.cover()
+        if data:
+            return Response(data, media_type="image/png", headers={"Cache-Control": "no-store"})
+        book = pipeline.load_book(p.epub_path)
+        if book.cover_href and book.cover_href in book.images:
+            data, mime = book.images[book.cover_href]
+            return Response(data, media_type=mime, headers={"Cache-Control": "no-store"})
+        raise HTTPException(404, "This book has no cover. Upload one in step 3.")
+
+    @r.post("/projects/{pid}/cover")
+    async def upload_cover(pid: str, file: UploadFile = File(...)):
+        data = await file.read(20 * 1024 * 1024 + 1)
+        if len(data) > 20 * 1024 * 1024:
+            raise HTTPException(413, "The picture is larger than 20 MB.")
+        store.get(pid).set_cover(data)
+        return {"cover": "uploaded"}
+
+    @r.delete("/projects/{pid}/cover")
+    def delete_cover(pid: str):
+        store.get(pid).remove_cover()
+        return {"cover": "removed"}
 
     # ---------------------------------------------------------------- looking inside
     @r.get("/projects/{pid}/pages")

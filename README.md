@@ -15,7 +15,10 @@ There are plenty of tools for going *from* ZIM *to* EPUB. This one goes the othe
 - **Full-text search** and search-as-you-type titles, built into the ZIM.
 - **Wiki-style links**: mentions of other article titles become links.
 - **Aliases**: extra search names (`PTSD` → *Posttraumatic Stress Disorder*).
-- **Pictures**, the book's metadata and its cover as the library icon.
+- **Tidy titles**: chapters called only “I”, “II” get their part's name in front
+  (“Part One · I”), and you can rename articles or **leave out** junk pages (title page, credits).
+- **Pictures**, the book's metadata, and a cover (the book's own, or one you upload) as the
+  library icon and on the home page.
 - **Scanned (OCR) books work too**: page numbers and running headers are removed, and a
   *title list* (filled automatically from running headers or a pattern) decides where
   articles start.
@@ -89,7 +92,7 @@ epub2zim speaks the [Model Context Protocol](https://modelcontextprotocol.io) at
 `http://localhost:5100/mcp` (Streamable HTTP, Bearer key) or over stdio
 (`epub2zim mcp-stdio`). Its tools mirror the web UI: `import_epub`, `inspect_book`,
 `read_pages`, `find_text`, `suggest_titles`, `set_title_list`, `update_settings`,
-`preview_split`, `build_zim` and more. Answers are kept short so small local models can
+`preview_split`, `set_cover`, `build_zim`, `delete_project` and more. Answers are kept short so small local models can
 follow.
 
 **LM Studio** (`mcp.json`):

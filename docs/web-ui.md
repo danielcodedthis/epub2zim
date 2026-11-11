@@ -49,21 +49,29 @@ Choosing **Title list** opens the editor:
 
 ### 3 · Name & extras
 
-Title, author, language (3 letters: `eng`, `deu`, `fra`, `bul` …), a short description
-(max 80 characters), and under *More file details* the publisher and short name.
+- **About the file:** the **cover** (the book's own, or *Upload a cover…*; *Remove my cover*
+  goes back to the book's), title, author, language (3 letters: `eng`, `deu`, `fra`, `bul` …),
+  a short description (max 80 characters; a reminder shows while it's empty), and under
+  *More file details* the publisher and short name.
+- **Article titles:** *Put the part's name in front of a chapter title* (Never / Short titles
+  only / Always), **Rename articles** (`Old title = New title`) and **Leave out these
+  articles** (one title per line, `*` wildcard).
+- **Extras:** wiki-style links, pictures on/off, cover on the home page on/off.
+- **Aliases:** extra search names (`PTSD = Posttraumatic Stress Disorder`).
 
-**Extras:** wiki-style links between articles, pictures on/off, and **aliases**: extra
-search names (`PTSD = Posttraumatic Stress Disorder`). See
-[Aliases and extras](aliases-and-extras.md).
+See [Titles, leaving out, covers, aliases](aliases-and-extras.md).
 
 ### 4 · Preview articles
 
 Click **Preview articles**. Nothing is written. You see:
 
-- chips with the number of articles, total size, page offset, and counts of
-  **very short** (under 150 characters) and **very long** (over 80,000) articles;
+- chips with the number of articles, total size, page offset, how many titles were
+  improved or left out, and counts of **very short** (under 150 characters, not counting
+  parts that just list their chapters) and **very long** (over 80,000) articles;
 - a red box listing titles that were **not found** (title list strategy);
-- the full table: number, title (indented by level), page file, size and first words.
+- the full table: number, title (indented by level, with “was …” for improved titles), page
+  file, size, first words, and a **✕** to leave that article out (it's added to step 3's
+  list and the preview runs again).
 
 Fix steps 2–3 and preview again as often as you like.
 

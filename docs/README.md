@@ -20,7 +20,7 @@ Zimi, [Kiwix](https://kiwix.org) and other ZIM readers.
 | The four ways to split a book into articles | [Splitting strategies](splitting-strategies.md) |
 | Writing a title list by hand | [Title list format](title-list-format.md) |
 | Converting a scanned (OCR) book | [Scanned books walkthrough](scanned-books.md) |
-| Aliases, links, pictures, metadata | [Aliases and extras](aliases-and-extras.md) |
+| Better titles, leaving pages out, covers, aliases, links | [Titles, leaving out, covers, aliases](aliases-and-extras.md) |
 
 ## AI assistants
 

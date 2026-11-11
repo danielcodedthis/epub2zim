@@ -31,8 +31,11 @@ Doc: docs/how-it-works.md.
 - **Books page:** drop an EPUB; your books are listed below.
 - **Step 1 Look:** what was found + the suggested strategy; *Peek inside* reads pages and searches.
 - **Step 2 Split:** pick a strategy card; *Title list* opens an editor with *Fill from* helpers.
-- **Step 3 Name & extras:** title, language (3 letters), description (≤ 80), aliases, links, pictures.
-- **Step 4 Preview:** list of articles, “not found” titles, very short/long ones. Nothing is written.
+- **Step 3 Name & extras:** cover (upload your own), title, language (3 letters), description
+  (≤ 80), article titles (part names in front of "I", "II"…, renames, **leave out** pages),
+  aliases, links, pictures.
+- **Step 4 Preview:** list of articles, “not found” titles, very short/long ones, and a ✕ on
+  each row to leave that article out. Nothing is written.
 - **Step 5 Build:** the gradient button; then *Download*. A copy goes to `data/output`.
 - **Settings page:** folders, MCP key and setup snippets, theme.
 Changes save automatically. Doc: docs/web-ui.md.
@@ -52,6 +55,13 @@ Changes save automatically. Doc: docs/web-ui.md.
 - **Titles not found?** The title isn't spelled like in the book, or the page is off. Search
   it in step 1, copy the exact spelling (third column), fix the page. docs/troubleshooting.md.
 - **Articles too big / too small?** Change strategy or heading level, or edit the title list.
+- **Junk pages (title page, credits)?** ✕ in the preview, or the *Leave out* list in step 3.
+- **Chapters only called "I", "II"?** *Short titles only* (the default) makes them "Part One · I";
+  rename others in step 3.
+- **Cover?** Step 3 → *Upload a cover…* (square, about 500×500). It's the library icon and sits
+  on the home page.
+- **Fix one article after building?** Not inside the ZIM; change the settings and build again
+  (seconds). Leave out, rename and title list cover most fixes.
 - **Can an AI do it?** Yes, via the MCP server; see the epub2zim-mcp-setup skill.
 - **PDF?** Convert to EPUB with Calibre first; treat it like a scanned book.
 - **Copyright:** convert books you have the right to use; don't share ZIMs of copyrighted books.

@@ -56,8 +56,16 @@ Chapter title | 45       (starts on page file 45; 1 = first file)
      "Prevalence", "Differential Diagnosis"]) → they become headings;
    - `detect_lists: true` if the book has "A. … B. …" or "1. … 2. …" criteria.
 
-6. **Aliases and build.** Optional `set_aliases` for abbreviations, then `build_zim`.
+6. **Leave out, aliases and build.** Leave out junk sections with
+   `update_settings {"exclude": [...]}`, optionally `set_aliases` for abbreviations, then `build_zim`.
    Report misses that remain; their text is inside the previous article.
+
+## Text to look for: short is best
+
+The matched words are removed from the start of the article only when they look like a
+heading (≤ 12 words, not ending like a sentence). If the book has no headings and you must
+use a sentence as the text to look for, it is kept in the article. Still, 3–8 distinctive
+words are the most reliable match. `drop_heading_text: false` keeps every matched text.
 
 ## Tips
 

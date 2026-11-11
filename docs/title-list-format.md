@@ -24,7 +24,8 @@ Each entry has up to three columns separated by `|`:
    is a *printed* page and is turned into a page file with the page offset
    (`page file = printed page + offset`).
 3. **Text to look for** (optional): the exact words that begin the article in the book,
-   if they differ from the title. Everything after the second `|` is used, so it may
+   if they differ from the title. Short heading-like text is removed from the article start;
+   a whole sentence (when the book has no headings) is kept. Everything after the second `|` is used, so it may
    contain `|` itself (handy for OCR errors like `Bipolar | Disorder`).
 
 ## Example

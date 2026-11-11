@@ -30,26 +30,29 @@ def split_by_toc(book: Book, blocks: list[Block]) -> SplitResult:
         result.warnings.append("This book has no table of contents. Try the 'headings' or 'files' strategy.")
         return result
 
-    starts: list[tuple[int, str, int]] = []  # (block index, title, level)
-    seen: set[int] = set()
-    for entry in book.toc:
+    # (block index, order in the TOC, title, level)
+    starts: list[tuple[int, int, str, int]] = []
+    level_at: dict[int, int] = {}        # deepest level already starting at each block
+    for order, entry in enumerate(book.toc):
         doc = book.doc_by_href(entry.href)
         idx = _find_block(blocks, doc.index, entry.fragment) if doc else None
         if idx is None:
             result.misses.append(entry.title)
-        elif idx in seen:
-            # Two TOC entries at the same spot (e.g. "Part 1" and "Chapter 1"): keep the first.
+        elif idx in level_at and entry.level <= level_at[idx]:
+            # Two entries of the same level at the same spot: keep the first one.
             result.warnings.append(f"'{entry.title}' starts at the same place as another entry; merged.")
         else:
-            seen.add(idx)
-            starts.append((idx, entry.title, entry.level))
+            # A deeper entry at the same spot ("Part One" and its chapter "I") is kept:
+            # the part becomes a short page listing its chapters, the chapter gets the text.
+            level_at[idx] = entry.level
+            starts.append((idx, order, entry.title, entry.level))
 
     starts.sort()
     if starts and starts[0][0] > 0:
         fm = front_matter(blocks[: starts[0][0]])
         if fm:
             result.articles.append(fm)
-    for n, (idx, title, level) in enumerate(starts):
+    for n, (idx, _, title, level) in enumerate(starts):
         end = starts[n + 1][0] if n + 1 < len(starts) else len(blocks)
         result.articles.append(blocks_to_article(title, level, blocks[idx:end]))
     return result

@@ -38,6 +38,7 @@ export async function renderProject(view, id) {
     aliases: data.aliases || "",
     dirty: new Set(),                       // which parts need saving: settings / titles / aliases
     listeners: [],                          // steps can react to changes (e.g. strategy)
+    hooks: {},                              // steps can expose refresh functions to each other
     status: null,
   };
 

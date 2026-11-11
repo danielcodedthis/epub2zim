@@ -52,10 +52,12 @@ context windows can follow along.
 | `set_title_list` | `project_id, text` | Replace the whole list (checked before saving) |
 | `replace_in_title_list` | `project_id, old, new` | Small edit (first occurrence); `new=""` deletes |
 | `get_settings` | `project_id` | All settings as JSON |
-| `update_settings` | `project_id, changes` | e.g. `{"strategy":"headings","heading_level":2}` |
+| `update_settings` | `project_id, changes` | e.g. `{"strategy":"headings","heading_level":2}`, `{"description":"…"}`, `{"exclude":["Title page","Credits*"]}`, `{"renames":["Old = New"]}`, `{"parent_prefix":"short"}` |
 | `get_aliases` / `set_aliases` | `project_id[, text]` | `Short name = Article title` per line |
-| `preview_split` | `project_id, first=1, show=40` | Article count, **misses**, warnings, and a page of the article list |
+| `preview_split` | `project_id, first=1, show=40` | Article count, **misses**, warnings, **left out** titles, and a page of the article list |
+| `set_cover` | `project_id, file_name=""` | Use a picture from `inbox/` as cover and icon; empty removes it |
 | `build_zim` | `project_id` | Builds the file; returns name, size, counts and a download link |
+| `delete_project` | `project_id, confirm=false` | Deletes a project. Without `confirm=true` it only explains what would be deleted, so the model can ask the user first |
 
 Errors come back as readable tool errors (“No project called …”, “Line 3: 'x' is not a
 page number”), so the model can correct itself.
@@ -68,9 +70,11 @@ page number”), so the model can correct itself.
    - `titles`: the book is a scan; build a title list.
 3. For `titles`: `suggest_titles` (`running_headers` or `pattern`), check with `read_pages`
    and `find_text`, fix with `set_title_list` / `replace_in_title_list`.
-4. `update_settings`: title, description (≤ 80 characters), language (3 letters), creator.
+4. `update_settings`: title, description (≤ 80 characters; always set one), language (3 letters), creator.
 5. `preview_split`: check the count, the misses, very short or very long articles. Repeat.
-6. Optional `set_aliases`.
+   Junk pages → `exclude`; chapters called “I”, “II” → `parent_prefix` (default `short`);
+   other bad titles → `renames`.
+6. Optional `set_aliases`, `set_cover`.
 7. `build_zim`, then tell the user the file name and where it is.
 
 ## Which models work well?

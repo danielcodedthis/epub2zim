@@ -12,6 +12,7 @@ From EPUB to ZIM in six stages. Each stage is one small module in `src/epub2zim/
     ▼
  blocks / page texts
     │  3. split         splitters/       toc | headings | files | titles  → articles
+    │     edit          article_edits.py renames, “Part One · I” titles, leave out junk pages
     ▼
  articles
     │  4. format        formatter.py     safe, tidy HTML; pictures and links pointed at new places

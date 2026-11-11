@@ -148,3 +148,29 @@ def make_scanned_epub(path) -> Path:
         manifest.append(f'<item id="p{i}" href="page_{i}.html" media-type="application/xhtml+xml"/>')
     return _write(path, files, manifest, [f"p{i}" for i in range(1, len(pages) + 1)], "The Garden Book",
                   None, False, False)
+
+
+def make_novel_epub(path) -> Path:
+    """A Bulgarian novel shaped like chitanka.info books: a title page, two parts whose
+    chapters are only Roman numerals, and a credits page at the end."""
+    chapters = [
+        ("title.xhtml", "Заглавна страница", "<p>Фьодор Достоевски. Престъпление и наказание. Роман.</p>"),
+        ("p1c1.xhtml", "I", "<p>В началото на юли, в много горещо време, един младеж излезе от стаичката си.</p>"),
+        ("p1c2.xhtml", "II", "<p>Той не беше свикнал с тълпата и избягваше всякакво общество.</p>"),
+        ("p2c1.xhtml", "I", "<p>Така той лежа дълго време. Понякога сякаш се събуждаше.</p>"),
+        ("p2c2.xhtml", "II", "<p>Ами ако вече е имало обиск? Ами ако ги намеря в къщи?</p>"),
+        ("credits.xhtml", "Заслуги", "<p>Издание: Народна култура. Сканиране и корекция: доброволци.</p>"),
+    ]
+    files, manifest = {}, []
+    for i, (name, title, body) in enumerate(chapters, start=1):
+        files[f"OEBPS/{name}"] = _xhtml(title, f"<h2>{title}</h2>{body}")
+        manifest.append(f'<item id="c{i}" href="{name}" media-type="application/xhtml+xml"/>')
+    nav = ('<ol><li><a href="title.xhtml">Заглавна страница</a></li>'
+           '<li><a href="p1c1.xhtml">Част първа</a><ol><li><a href="p1c1.xhtml">I</a></li><li><a href="p1c2.xhtml">II</a></li></ol></li>'
+           '<li><a href="p2c1.xhtml">Част втора</a><ol><li><a href="p2c1.xhtml">I</a></li><li><a href="p2c2.xhtml">II</a></li></ol></li>'
+           '<li><a href="credits.xhtml">Заслуги</a></li></ol>')
+    files["OEBPS/nav.xhtml"] = _xhtml("Съдържание", f'<nav epub:type="toc" xmlns:epub="http://www.idpf.org/2007/ops">{nav}</nav>')
+    manifest.append('<item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>')
+    path = _write(path, files, manifest, [f"c{i}" for i in range(1, len(chapters) + 1)],
+                  "Престъпление и наказание", None, False, False)
+    return path

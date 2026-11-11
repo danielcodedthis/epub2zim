@@ -24,20 +24,29 @@ short sentence per step.
 
 3. **Set the details.** Call `update_settings(project_id, changes)` with what you know,
    e.g. `{"title": "...", "language": "eng", "description": "..."}`.
-   - `description` must be **80 characters or fewer**.
+   - Always set a `description` (one line, **80 characters or fewer**). If you leave it
+     empty, the preview shows a reminder and a generic text is used.
    - `language` is 3 letters: eng, deu, fra, spa, ita, bul, rus…
    - Only change `strategy` if step 4 shows a problem.
 
 4. **Preview.** Call `preview_split(project_id)`. Check:
    - `articles=` is sensible for the book (not 0 or 1 for a whole novel; not thousands).
    - Any `MISSES` or `WARNING` lines.
+   - `LEFT OUT` lines show articles the exclude list removed.
    - Fixes: 0 articles with `toc` → `update_settings {"strategy": "headings", "heading_level": 2}`.
      Articles too big → `headings` with `heading_level` 2 or 3. Nothing works →
      `{"strategy": "files"}`. Preview again after each change.
+   - **Junk pages** (title page, credits, "About this edition", printed contents):
+     `update_settings {"exclude": ["Title page", "Credits*"]}`. Use the exact titles from the
+     preview; `*` matches anything; case doesn't matter. Tell the user what you left out.
+   - **Chapters called only "I", "II", "3"**: the default `parent_prefix: "short"` already
+     makes them "Part One · I". If titles are still unclear, use
+     `{"renames": ["Old title = New title"]}` (exact titles from the preview).
 
-5. **Aliases (optional).** If the book has common abbreviations or alternative names, call
-   `set_aliases` with lines like `ADHD = Attention-Deficit/Hyperactivity Disorder`. The
-   right side must be an exact article title from the preview.
+5. **Aliases and cover (optional).** If the book has common abbreviations or alternative
+   names, call `set_aliases` with lines like `ADHD = Attention-Deficit/Hyperactivity Disorder`.
+   The right side must be an exact article title from the preview. If the user put a picture
+   in the inbox for the cover, call `set_cover(project_id, file_name)`.
 
 6. **Build.** Call `build_zim(project_id)`. Then tell the user:
    - the file name and size, and how many articles;
@@ -48,6 +57,8 @@ short sentence per step.
 
 - Don't invent file names or project ids: take them from tool answers.
 - Don't replace a title list the user wrote without asking.
+- To clean up, `delete_project(project_id)` first explains what would be deleted. Ask the user,
+  then call it again with `confirm=true`. Never delete a project you didn't create without asking.
 - If a tool returns an error, read it, fix the input, and try once more. If it fails again,
   explain the error to the user.
 - Keep `preview_split`'s `show` small (e.g. 30) if your context is short; use `first` to page.

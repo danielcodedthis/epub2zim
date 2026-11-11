@@ -15,6 +15,7 @@ it. Read [How it works](how-it-works.md) first for the big picture.
 | `titlelist.py` | Title list & alias text formats | extend the format |
 | `splitters/` | The four strategies (one file each) + `base.py` | add a strategy |
 | `propose.py` | Automatic title lists | add a “Fill from” method |
+| `article_edits.py` | After splitting: renames, part names in front of short titles, leaving articles out | change title rules |
 | `formatter.py` | Article content → safe HTML | allow more tags, change paragraphs |
 | `autolink.py` | Wiki-style links | change linking rules |
 | `zim_pages.py` | Article/home page HTML and CSS inside the ZIM | change how articles look |

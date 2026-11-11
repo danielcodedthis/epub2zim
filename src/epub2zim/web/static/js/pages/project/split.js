@@ -29,7 +29,7 @@ export function renderSplit(ctx, body, head) {
     <div>
       <div class="choice-grid" role="group" aria-label="Splitting strategy">
         ${CHOICES.map(([k, t, d]) => `<button type="button" class="choice" data-strategy="${k}" aria-pressed="${s.strategy === k}">
-            <b>${t}${ctx.data.inspect.suggested_strategy === k ? ' <span class="chip kw">suggested</span>' : ""}</b><span>${d}</span></button>`).join("")}
+            <b>${t}</b>${ctx.data.inspect.suggested_strategy === k ? '<span class="chip kw">suggested</span>' : ""}<span class="desc">${d}</span></button>`).join("")}
       </div>
 
       <div id="opt-headings" class="field">
@@ -69,6 +69,8 @@ export function renderSplit(ctx, body, head) {
           <div class="checks">
             <label class="check"><input type="checkbox" id="clean"> Remove page numbers and running headers</label>
             <label class="check"><input type="checkbox" id="lists"> Put “A. … B. …” and “1. … 2. …” items on their own lines</label>
+            <label class="check"><input type="checkbox" id="dropheading"> Remove the matched heading words from the start of each article
+              <span class="hint">(whole sentences are always kept)</span></label>
           </div>
           <div class="form-grid" style="margin-top:12px">
             <label class="field"><span>Page offset <span class="hint">“auto”, a number, or empty</span></span>
@@ -88,6 +90,7 @@ export function renderSplit(ctx, body, head) {
   ta.value = ctx.titles;
   $(body, "#clean").checked = s.clean_text;
   $(body, "#lists").checked = s.detect_lists;
+  $(body, "#dropheading").checked = s.drop_heading_text;
   $(body, "#offset").value = s.page_offset;
   $(body, "#para").value = s.paragraph_size;
   $(body, "#subs").value = (s.subheadings || []).join("\n");
@@ -114,6 +117,7 @@ export function renderSplit(ctx, body, head) {
   ta.addEventListener("input", () => { ctx.titles = ta.value; countTitles(); ctx.changed("titles"); });
   $(body, "#clean").addEventListener("change", (e) => { ctx.settings.clean_text = e.target.checked; ctx.changed("settings"); });
   $(body, "#lists").addEventListener("change", (e) => { ctx.settings.detect_lists = e.target.checked; ctx.changed("settings"); });
+  $(body, "#dropheading").addEventListener("change", (e) => { ctx.settings.drop_heading_text = e.target.checked; ctx.changed("settings"); });
   $(body, "#offset").addEventListener("input", (e) => { ctx.settings.page_offset = e.target.value.trim(); ctx.changed("settings"); });
   $(body, "#para").addEventListener("change", (e) => { ctx.settings.paragraph_size = Number(e.target.value) || 650; ctx.changed("settings"); });
   $(body, "#subs").addEventListener("input", (e) => {

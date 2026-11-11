@@ -37,6 +37,10 @@ export const api = {
   find: (id, q, regex = false) => request("GET", `/api/projects/${id}/find?q=${encodeURIComponent(q)}&regex=${regex}`),
   suggest: (id, method, level = 2, pattern = "") => request("POST", `/api/projects/${id}/suggest`, { method, level, pattern }),
 
+  coverUrl: (id) => `/api/projects/${id}/cover?t=${Date.now()}`,
+  uploadCover: (id, file) => { const f = new FormData(); f.append("file", file); return request("POST", `/api/projects/${id}/cover`, f); },
+  removeCover: (id) => request("DELETE", `/api/projects/${id}/cover`),
+
   preview: (id) => request("POST", `/api/projects/${id}/preview`),
   build: (id) => request("POST", `/api/projects/${id}/build`),
   downloadUrl: (id, file) => `/api/projects/${id}/download/${encodeURIComponent(file)}`,

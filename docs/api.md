@@ -22,7 +22,10 @@ with status 400 (bad input), 404 (unknown project) or 413 (file too big).
 | GET | `/api/projects/{id}/pages` | `?start=1&count=3&chars=600` | page texts |
 | GET | `/api/projects/{id}/find` | `?q=text&regex=false&limit=30` | matches with snippets |
 | POST | `/api/projects/{id}/suggest` | `{"method","level","pattern"}` | `{"text": title list}` |
-| POST | `/api/projects/{id}/preview` | | articles, misses, warnings |
+| GET | `/api/projects/{id}/cover` | | the cover that will be used (your upload, else the book's) |
+| POST | `/api/projects/{id}/cover` | multipart `file=@cover.png` | `{"cover": "uploaded"}` (PNG/JPG/WebP/GIF, shrunk to fit 1000 px) |
+| DELETE | `/api/projects/{id}/cover` | | `{"cover": "removed"}` |
+| POST | `/api/projects/{id}/preview` | | articles (with `renamed_from`), misses, warnings, `excluded` |
 | POST | `/api/projects/{id}/build` | | build report (file name, size, counts) |
 | GET | `/api/projects/{id}/download/{file}` | | the .zim file |
 
@@ -45,5 +48,7 @@ curl -s -o "$FILE" $BASE/projects/$ID/download/$FILE
 `title`, `description` (≤ 80), `language`, `creator`, `publisher`, `name`,
 `strategy` (`toc|headings|files|titles`), `heading_level` (1–6), `clean_text`,
 `page_offset` (`"auto"`, a number or `""`), `subheadings` (list), `detect_lists`,
-`paragraph_size` (≥ 200), `autolink`, `autolink_min_length`, `include_images`.
+`paragraph_size` (≥ 200), `drop_heading_text`, `autolink`, `autolink_min_length`,
+`include_images`, `cover_on_home`, `parent_prefix` (`never|short|always`), `prefix_separator`,
+`renames` (list of `Old = New`), `exclude` (list of titles, `*` wildcard).
 See [`settings.py`](../src/epub2zim/settings.py).

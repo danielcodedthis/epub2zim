@@ -12,6 +12,7 @@ The package is split into small modules, each doing one job:
     titlelist.py     reads/writes the plain-text "title list" format
     splitters/       the four ways to cut a book into articles
     propose.py       suggests a title list automatically
+    article_edits.py renames, "Part One · I" titles, leaving articles out
     formatter.py     turns an article's content into tidy HTML
     autolink.py      links mentions of other article titles (wiki-style)
     zim_pages.py     the HTML/CSS of pages inside the ZIM file
@@ -23,7 +24,7 @@ The package is split into small modules, each doing one job:
     cli.py           the `epub2zim` command
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 import warnings as _warnings
 
