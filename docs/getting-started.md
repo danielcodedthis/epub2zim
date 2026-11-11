@@ -21,7 +21,7 @@ More options in [Docker](docker.md).
 
 ## Option B: pip
 
-You need Python 3.10 or newer.
+You need Python 3.11 or newer.
 
 ```bash
 git clone https://github.com/danielcodedthis/epub2zim.git

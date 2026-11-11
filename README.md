@@ -44,7 +44,7 @@ pip install .
 epub2zim serve                                          # http://localhost:5100
 epub2zim convert mybook.epub                            # or straight from the command line
 ```
-Python 3.10+.
+Python 3.11+.
 </details>
 
 ## How it works

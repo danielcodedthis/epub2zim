@@ -97,5 +97,5 @@ pytest
 ```
 
 `tests/epub_factory.py` builds tiny EPUBs on the fly (a normal book and a fake scan), so the
-tests need no real books. CI (`.github/workflows/tests.yml`) runs them on Python 3.10–3.13
+tests need no real books. CI (`.github/workflows/tests.yml`) runs them on Python 3.11–3.13
 and checks the Docker image starts.

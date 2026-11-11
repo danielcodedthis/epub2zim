@@ -12,7 +12,7 @@ version = "0.1.0"
 description = "Turn EPUB books into searchable, wiki-style ZIM files for Kiwix, Zimi and other ZIM readers."
 readme = "README.md"
 license = "GPL-3.0-or-later"
-requires-python = ">=3.10"
+requires-python = ">=3.11"   # libzim 4 needs Python 3.11+
 authors = [{ name = "epub2zim contributors" }]
 keywords = ["epub", "zim", "kiwix", "zimi", "openzim", "ebook", "ebook-converter", "offline", "ocr", "mcp", "mcp-server", "lm-studio", "open-webui"]
 classifiers = [
